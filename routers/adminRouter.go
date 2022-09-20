@@ -8,6 +8,8 @@ import (
 func AdminRouterInit(r *gin.Engine) {
 	adminRouter := r.Group("/admin")
 	{
+		// 获取管理员登录验证码
+		adminRouter.GET("/captcha", admin.LoginController{}.Captcha)
 		// 管理员登录
 		adminRouter.POST("/login", admin.LoginController{}.Login)
 		// 管理员列表
