@@ -31,8 +31,8 @@ func CaptMake() (id, b64s string, err error) {
 	//创建 Captcha
 	captcha := base64Captcha.NewCaptcha(driver, store)
 	//Generate 生成随机 id、base64 图像字符串
-	lid, lb64s, lerr := captcha.Generate()
-	return lid, lb64s, lerr
+	id, b64s, err = captcha.Generate()
+	return id, b64s, err
 }
 
 // CaptVerify 验证 captcha 是否正确
