@@ -12,6 +12,6 @@ func (b BaseController) Success(c *gin.Context) {
 	c.String(http.StatusOK, "success!")
 }
 
-func (b BaseController) Error(c *gin.Context) {
-	c.String(http.StatusOK, "error!")
+func (b BaseController) Error(c *gin.Context, msg string) {
+	c.String(http.StatusOK, msg)
 }
