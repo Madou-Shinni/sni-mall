@@ -3,10 +3,11 @@ package routers
 import (
 	"github.com/gin-gonic/gin"
 	"xiaomi-mall/controllers/admin"
+	"xiaomi-mall/middlewares"
 )
 
 func AdminRouterInit(r *gin.Engine) {
-	adminRouter := r.Group("/admin")
+	adminRouter := r.Group("/admin", middlewares.InitAdminAuthMiddleware)
 	{
 		// 获取管理员登录验证码
 		adminRouter.GET("/captcha", admin.LoginController{}.Captcha)
