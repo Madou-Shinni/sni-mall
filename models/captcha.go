@@ -3,10 +3,13 @@ package models
 import (
 	"github.com/mojocn/base64Captcha"
 	"image/color"
+	"xiaomi-mall/models/redis"
 )
 
 // 设置自带的 store
-var store = base64Captcha.DefaultMemStore
+//var store = base64Captcha.DefaultMemStore
+// 设置自定义store 让RedisStore实现Store接口
+var store base64Captcha.Store = redis.RedisStore{}
 
 // CaptMake 生成验证码
 func CaptMake() (id, b64s string, err error) {

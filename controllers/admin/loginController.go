@@ -19,8 +19,9 @@ func (con LoginController) Login(c *gin.Context) {
 	// 2.验证验证码
 	if flag := models.CaptVerify(captchaId, verifyValue); flag == false {
 		c.String(http.StatusOK, "验证失败！")
+	} else {
+		c.String(http.StatusOK, "验证成功!")
 	}
-	c.String(http.StatusOK, "验证成功!")
 }
 
 // Captcha 获取验证码
