@@ -1,19 +1,19 @@
 package admin
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"xiaomi-mall/models"
 	mysql "xiaomi-mall/models/mysql"
 	utils "xiaomi-mall/models/utils"
+	"xiaomi-mall/models/utils/jwt"
 )
 
 const (
 	FailedCaptVerify = "验证码错误！"
 	FailedLogin      = "用户名或密码错误！"
+	FailedSystem     = "系统故障请联系管理员！"
 )
 
 type LoginController struct {
@@ -37,12 +37,17 @@ func (con LoginController) Login(c *gin.Context) {
 		result := mysql.DB.Where("username = ? AND password = ?", username, password).First(&userInfo).RowsAffected // 返回找到的记录数
 		if result > 0 {
 			// 4.登录成功，保存用户信息
-			session := sessions.Default(c)
+			//session := sessions.Default(c)
 			// 注意：session无法直接保存结构体！ 把结构体转换成json字符串
-			userInfoJsonStr, _ := json.Marshal(userInfo)
-			session.Set("userInfo", userInfoJsonStr)
-			session.Save()
-			con.Success(c)
+			//userInfoJsonStr, _ := json.Marshal(userInfo)
+			//session.Set("userInfo", userInfoJsonStr)
+			//session.Save()
+			token, err := jwt.GenToken(int64(userInfo.Id), username)
+			if err != nil {
+				con.Error(c, FailedSystem)
+				return
+			}
+			con.SuccessAndData(c, token)
 		} else {
 			con.Error(c, FailedLogin)
 		}
@@ -51,9 +56,9 @@ func (con LoginController) Login(c *gin.Context) {
 
 // Logout 退出登录
 func (con LoginController) Logout(c *gin.Context) {
-	session := sessions.Default(c)
-	session.Delete("userInfo")
-	session.Save()
+	//session := sessions.Default(c)
+	//session.Delete("userInfo")
+	//session.Save()
 	con.Success(c)
 }
 

@@ -1,7 +1,7 @@
 package models
 
 type Manager struct {
-	Id       int
+	Id       int64
 	Username string
 	Password string
 	Mobile   int

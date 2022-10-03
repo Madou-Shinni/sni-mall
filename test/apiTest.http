@@ -3,4 +3,10 @@
 POST http://localhost:8080/admin/login
 Content-Type: application/x-www-form-urlencoded
 
-captchaId=3cqSDGE2NVn0Cezh6JnE&verifyValue=zwr0&username=admin&password=123456
+captchaId=bCEKG08cqxcRZKfuQbz7&verifyValue=qf9t&username=admin&password=123456
+
+###
+## 测试jwt权限校验
+GET http://localhost:8080/admin/list
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjY0ODkzOTUyLCJpc3MiOiJ5dW1jbG9yIn0.h78HSxyXipIbTARNKFl41m61mvlwc7lyW-ePmYmbO5A
