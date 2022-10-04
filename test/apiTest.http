@@ -10,3 +10,31 @@ captchaId=bCEKG08cqxcRZKfuQbz7&verifyValue=qf9t&username=admin&password=123456
 GET http://localhost:8080/admin/list
 Content-Type: application/x-www-form-urlencoded
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjY0ODkzOTUyLCJpc3MiOiJ5dW1jbG9yIn0.h78HSxyXipIbTARNKFl41m61mvlwc7lyW-ePmYmbO5A
+
+###
+## 测试添加角色
+POST http://localhost:8080/admin/role/add
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjY0ODkzOTUyLCJpc3MiOiJ5dW1jbG9yIn0.h78HSxyXipIbTARNKFl41m61mvlwc7lyW-ePmYmbO5A
+
+title=超级管理员&description=我是一个部门的超级管理员
+
+###
+## 测试角色列表
+GET http://localhost:8080/admin/role/list
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjY0ODkzOTUyLCJpc3MiOiJ5dW1jbG9yIn0.h78HSxyXipIbTARNKFl41m61mvlwc7lyW-ePmYmbO5A
+
+###
+## 测试修改角色
+PUT http://localhost:8080/admin/role/update
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjY0ODkzOTUyLCJpc3MiOiJ5dW1jbG9yIn0.h78HSxyXipIbTARNKFl41m61mvlwc7lyW-ePmYmbO5A
+
+id=15&title=超级管理员111&description=我是一个部门的超级管理员111
+
+###
+## 测试删除角色
+DELETE http://localhost:8080/admin/role/delete?id=15
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjY0ODkzOTUyLCJpc3MiOiJ5dW1jbG9yIn0.h78HSxyXipIbTARNKFl41m61mvlwc7lyW-ePmYmbO5A

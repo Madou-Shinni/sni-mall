@@ -14,8 +14,8 @@ func (b BaseController) Success(c *gin.Context) {
 
 func (b BaseController) SuccessAndData(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, gin.H{
-		"msg":   "success",
-		"token": data,
+		"msg":  "success",
+		"data": data,
 	})
 }
 
