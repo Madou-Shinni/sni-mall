@@ -19,13 +19,13 @@ func AdminRouterInit(r *gin.Engine) {
 		adminRouter.Use(middlewares.InitAdminAuthMiddleware)
 
 		// 管理员列表
-		adminRouter.GET("/list", admin.AdminController{}.List)
+		adminRouter.GET("/manager/list", admin.ManagerController{}.List)
 		// 添加管理员
-		adminRouter.POST("/add", admin.AdminController{}.Add)
+		adminRouter.POST("/manager", admin.ManagerController{}.Add)
 		// 修改管理员
-		adminRouter.PUT("/update", admin.AdminController{}.Update)
+		adminRouter.PUT("/manager", admin.ManagerController{}.Update)
 		// 删除管理员
-		adminRouter.DELETE("/delete", admin.AdminController{}.Delete)
+		adminRouter.DELETE("/manager", admin.ManagerController{}.Delete)
 
 		// 角色列表
 		adminRouter.GET("/role/list", admin.RoleController{}.List)

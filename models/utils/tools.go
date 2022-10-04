@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"time"
 )
 
 // Md5 加密
@@ -20,8 +21,25 @@ func StringToInt(str string) (int, error) {
 	return int, err
 }
 
-// IntToString 将string转换成int
+// IntToString 将int转换成string
 func IntToString(int int) string {
 	str := strconv.Itoa(int)
 	return str
+}
+
+// StringToInt64 将string转换成int64
+func StringToInt64(str string) (int64, error) {
+	int, err := strconv.ParseInt(str, 10, 64)
+	return int, err
+}
+
+// Int64ToString 将int64转换成string
+func Int64ToString(int64 int64) string {
+	str := strconv.FormatInt(int64, 10)
+	return str
+}
+
+// GetUnix 获取当前时间
+func GetUnix() int64 {
+	return time.Now().Unix()
 }

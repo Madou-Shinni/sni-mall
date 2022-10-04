@@ -38,3 +38,17 @@ id=15&title=超级管理员111&description=我是一个部门的超级管理员1
 DELETE http://localhost:8080/admin/role/delete?id=15
 Content-Type: application/x-www-form-urlencoded
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjY0ODkzOTUyLCJpc3MiOiJ5dW1jbG9yIn0.h78HSxyXipIbTARNKFl41m61mvlwc7lyW-ePmYmbO5A
+
+###
+## 测试添加管理员
+POST http://localhost:8080/admin/manager
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjY0ODkzOTUyLCJpc3MiOiJ5dW1jbG9yIn0.h78HSxyXipIbTARNKFl41m61mvlwc7lyW-ePmYmbO5A
+
+username=yumclor&password=123456&email=1162744696@qq.com&mobile=18814826155&role_id=9
+
+###
+## 测试管理员列表
+GET http://localhost:8080/admin/manager/list
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjY0ODkzOTUyLCJpc3MiOiJ5dW1jbG9yIn0.h78HSxyXipIbTARNKFl41m61mvlwc7lyW-ePmYmbO5A
