@@ -7,7 +7,6 @@ import (
 	"xiaomi-mall/models"
 	mysql "xiaomi-mall/models/mysql"
 	utils "xiaomi-mall/models/utils"
-	"xiaomi-mall/models/utils/jwt"
 )
 
 const (
@@ -42,7 +41,7 @@ func (con LoginController) Login(c *gin.Context) {
 			//userInfoJsonStr, _ := json.Marshal(userInfo)
 			//session.Set("userInfo", userInfoJsonStr)
 			//session.Save()
-			token, err := jwt.GenToken(int64(userInfo.Id), username)
+			token, err := utils.GenToken(int64(userInfo.Id), username)
 			if err != nil {
 				con.Error(c, FailedSystem)
 				return

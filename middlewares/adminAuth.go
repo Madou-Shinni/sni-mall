@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"strings"
 	"time"
-	"xiaomi-mall/models/utils/jwt"
+	"xiaomi-mall/models/utils"
 )
 
 const (
@@ -55,7 +55,7 @@ func InitAdminAuthMiddleware(c *gin.Context) {
 		return
 	}
 	// 解析token
-	tokenStruck, err := jwt.ParseToken(tokenSlice[1])
+	tokenStruck, err := utils.ParseToken(tokenSlice[1])
 	if err != nil {
 		c.String(NOPERMISSIONSCODE, NOPERMISSIONSMSG)
 		c.Abort() //阻止执行

@@ -3,7 +3,7 @@
 POST http://localhost:8080/admin/login
 Content-Type: application/x-www-form-urlencoded
 
-captchaId=bCEKG08cqxcRZKfuQbz7&verifyValue=qf9t&username=admin&password=123456
+captchaId=FFQkHBFv9Sz1DdY3VYRg&verifyValue=t4vg&username=admin&password=123456
 
 ###
 ## 测试jwt权限校验
@@ -52,3 +52,9 @@ username=yumclor&password=123456&email=1162744696@qq.com&mobile=18814826155&role
 GET http://localhost:8080/admin/manager/list
 Content-Type: application/x-www-form-urlencoded
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjY0ODkzOTUyLCJpc3MiOiJ5dW1jbG9yIn0.h78HSxyXipIbTARNKFl41m61mvlwc7lyW-ePmYmbO5A
+
+###
+## 测试权限列表
+GET http://localhost:8080/admin/access/list
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjY1MDMzOTc5LCJpc3MiOiJ5dW1jbG9yIn0.MMndb6XzoxOhgZXK_DWrKY1QXkZdXJi1omWeiRFNwoY

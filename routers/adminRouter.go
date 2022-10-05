@@ -35,5 +35,14 @@ func AdminRouterInit(r *gin.Engine) {
 		adminRouter.PUT("/role/update", admin.RoleController{}.Update)
 		// 删除角色
 		adminRouter.DELETE("/role/delete", admin.RoleController{}.Delete)
+
+		// 权限列表
+		adminRouter.GET("/access/list", admin.AccessController{}.List)
+		// 添加权限
+		adminRouter.POST("/access", admin.AccessController{}.Add)
+		// 修改权限
+		adminRouter.PUT("/access", admin.AccessController{}.Update)
+		// 删除权限
+		adminRouter.DELETE("/access", admin.AccessController{}.Delete)
 	}
 }
