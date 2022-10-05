@@ -58,3 +58,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c
 GET http://localhost:8080/admin/access/list
 Content-Type: application/x-www-form-urlencoded
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjY1MDMzOTc5LCJpc3MiOiJ5dW1jbG9yIn0.MMndb6XzoxOhgZXK_DWrKY1QXkZdXJi1omWeiRFNwoY
+
+###
+## 测试菜单列表
+GET http://localhost:8080/admin
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjY1MDMzOTc5LCJpc3MiOiJ5dW1jbG9yIn0.MMndb6XzoxOhgZXK_DWrKY1QXkZdXJi1omWeiRFNwoY
+

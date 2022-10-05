@@ -7,13 +7,12 @@ const (
 )
 
 // GetCurrentUserId 获取当前的用户id
-func GetCurrentUserId(c *gin.Context) (userId int64, err error) {
+func GetCurrentUserId(c *gin.Context) (userId int64) {
 	uid, exists := c.Get(ContextUserIdKey)
 	if !exists {
 		// 上下文中不存在
 		return
 	}
-
 	if userId, exists = uid.(int64); !exists {
 		// 类型断言失败
 		return

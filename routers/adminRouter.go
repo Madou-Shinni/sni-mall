@@ -18,6 +18,9 @@ func AdminRouterInit(r *gin.Engine) {
 
 		adminRouter.Use(middlewares.InitAdminAuthMiddleware)
 
+		// 首页菜单
+		adminRouter.GET("/", admin.IndexController{}.Index)
+
 		// 管理员列表
 		adminRouter.GET("/manager/list", admin.ManagerController{}.List)
 		// 添加管理员
