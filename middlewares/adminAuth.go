@@ -1,9 +1,15 @@
 package middlewares
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"gopkg.in/ini.v1"
+	"os"
 	"strings"
 	"time"
+	request "xiaomi-mall/controllers"
+	"xiaomi-mall/models"
+	mysql "xiaomi-mall/models/mysql"
 	"xiaomi-mall/models/utils"
 )
 
@@ -11,7 +17,7 @@ const (
 	//USERINFO          = "userInfo" // 用户信息
 	NOPERMISSIONSCODE = 302
 	NOPERMISSIONSMSG  = "没有权限！"
-	ContextUserIdKey  = "userId"
+	ContextUserIdKey  = "userId" // 当前用户id
 )
 
 // InitAdminAuthMiddleware 权限判断中间件
@@ -69,5 +75,55 @@ func InitAdminAuthMiddleware(c *gin.Context) {
 	}
 	// 将请求的userId信息保存到上下文，后续可以通过c.Get("userId")获取
 	c.Set(ContextUserIdKey, tokenStruck.UserId)
+
+	// 用户登陆成功的权限处理
+	// 获取路由，当前："/admin/xx"，表中："/xx"，需要做处理去掉"/admin"之后再匹配
+	path := strings.Split(c.Request.URL.String(), "?")[0]
+	url := strings.Replace(path, "/admin", "", 1) // 去除一个 -1全部去除
+	// 判断是否是需要做权限处理的url
+	if !excludeAuthPath(url) {
+		// 1.获取用户信息（角色id）
+		userId := request.GetCurrentUserId(c)
+		userInfo := models.Manager{}
+		mysql.DB.Select("role_id").Where("id = ?", userId).Find(&userInfo)
+		// 2.获取当前用户的权限
+		var roleAccessList []models.RoleAccess
+		var accessIds []int
+		var accessList []models.Access
+		mysql.DB.Select("access_id").Where("role_id = ?", userInfo.RoleId).Find(&roleAccessList)
+		for _, v := range roleAccessList {
+			accessIds = append(accessIds, v.AccessId)
+		}
+		mysql.DB.Where("id in (?)", accessIds).Preload("AccessItem").Find(&accessList)
+		// 3.当前访问的路由path匹配权限中的url
+		for _, v := range accessList {
+			if url != v.Url {
+				c.String(NOPERMISSIONSCODE, NOPERMISSIONSMSG)
+				c.Abort()
+				return
+			}
+		}
+	}
+
 	c.Next()
+}
+
+// excludeAuthPath 对指定的路由url排除权限判断
+func excludeAuthPath(urlPath string) bool {
+	config, iniErr := ini.Load("./conf/app.ini")
+	if iniErr != nil {
+		fmt.Printf("Fail to read file: %v", iniErr)
+		os.Exit(1)
+	}
+
+	excludeAuthPath := config.Section("").Key("excludeAuthPath").String()
+	excludeAuthPathSlice := strings.Split(excludeAuthPath, ",") // 转化成切片
+
+	for _, v := range excludeAuthPathSlice {
+		if v != urlPath { // 访问的url不等于排除的url
+			return false
+		}
+	}
+
+	return true
 }
