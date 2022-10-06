@@ -95,6 +95,8 @@ func AdminRouterInit(r *gin.Engine) {
 		adminRouter.GET("/goods", admin.GoodsController{}.List)
 		// 商品信息列表（商品分类、颜色、类型列表）
 		adminRouter.GET("/goodsInfoList", admin.GoodsController{}.GoodsInfoList)
+		// 商品类型属性列表
+		adminRouter.GET("/goods", admin.GoodsController{}.Goods)
 		// 添加商品类型属性
 		adminRouter.POST("/goods/add", admin.GoodsController{}.Add)
 		// 修改商品类型属性
