@@ -3,10 +3,10 @@ package models
 type Setting struct {
 	Id              int    `form:"id" json:"id,omitempty"`
 	SiteTitle       string `form:"site_title" json:"siteTitle,omitempty"`
-	SiteLogo        string `form:"site_logo" json:"siteLogo,omitempty"`
+	SiteLogo        string `json:"siteLogo,omitempty"`
 	SiteKeywords    string `form:"site_keywords" json:"siteKeywords,omitempty"`
 	SiteDescription string `form:"site_description" json:"siteDescription,omitempty"`
-	NoPicture       string `form:"no_picture" json:"noPicture,omitempty"`
+	NoPicture       string `json:"noPicture,omitempty"`
 	SiteIcp         string `form:"site_icp" json:"siteIcp,omitempty"`
 	SiteTel         string `form:"site_tel" json:"siteTel,omitempty"`
 	SearchKeywords  string `form:"search_keywords" json:"searchKeywords,omitempty"`
