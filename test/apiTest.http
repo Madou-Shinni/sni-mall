@@ -71,4 +71,11 @@ GET http://localhost:8080/admin/focus
 Content-Type: application/x-www-form-urlencoded
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjY1MTA4NjcyLCJpc3MiOiJ5dW1jbG9yIn0.g-GwPT8bPq7ei0sd7OMnkNMLMcmz_PZ3py_3nr_BAcg
 
+###
+## 测试商品顶级分类列表
+GET http://localhost:8080/admin/goodsCate-topList
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjY1MTA4NjcyLCJpc3MiOiJ5dW1jbG9yIn0.g-GwPT8bPq7ei0sd7OMnkNMLMcmz_PZ3py_3nr_BAcg
+
+
 

@@ -60,5 +60,16 @@ func AdminRouterInit(r *gin.Engine) {
 		adminRouter.PUT("/focus", admin.FocusController{}.Update)
 		// 删除轮播图
 		adminRouter.DELETE("/focus", admin.FocusController{}.Delete)
+
+		// 商品顶级分类列表
+		adminRouter.GET("/goodsCate-topList", admin.GoodsCateController{}.TopList)
+		// 商品分类列表
+		adminRouter.GET("/goodsCate", admin.GoodsCateController{}.List)
+		// 添加商品分类
+		adminRouter.POST("/goodsCate/add", admin.GoodsCateController{}.Add)
+		// 修改商品分类
+		adminRouter.PUT("/goodsCate/update", admin.GoodsCateController{}.Update)
+		// 删除商品分类
+		adminRouter.DELETE("/goodsCate/delete", admin.GoodsCateController{}.Delete)
 	}
 }
