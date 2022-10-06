@@ -103,5 +103,16 @@ func AdminRouterInit(r *gin.Engine) {
 		adminRouter.PUT("/goods/update", admin.GoodsController{}.Update)
 		// 删除商品类型属性
 		adminRouter.DELETE("/goods/delete", admin.GoodsController{}.Delete)
+
+		// 导航列表
+		adminRouter.GET("/nav", admin.NavController{}.List)
+		// 导航分页列表
+		adminRouter.GET("/nav-page", admin.NavController{}.Page)
+		// 添加导航
+		adminRouter.POST("/nav/add", admin.NavController{}.Add)
+		// 修改导航
+		adminRouter.PUT("/nav/update", admin.NavController{}.Update)
+		// 删除导航
+		adminRouter.DELETE("/nav/delete", admin.NavController{}.Delete)
 	}
 }
