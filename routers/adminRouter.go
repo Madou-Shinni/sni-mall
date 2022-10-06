@@ -20,6 +20,8 @@ func AdminRouterInit(r *gin.Engine) {
 
 		// 首页菜单
 		adminRouter.GET("/", admin.IndexController{}.Index)
+		// 通用修改status接口
+		adminRouter.GET("/changeStatus", admin.CommonController{}.ChangeStatus)
 
 		// 管理员列表
 		adminRouter.GET("/manager", admin.ManagerController{}.List)
