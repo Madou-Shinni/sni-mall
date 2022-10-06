@@ -86,22 +86,22 @@ func InitAdminAuthMiddleware(c *gin.Context) {
 		userId := request.GetCurrentUserId(c)
 		userInfo := models.Manager{}
 		mysql.DB.Select("role_id").Where("id = ?", userId).Find(&userInfo)
-		// 2.获取当前用户的权限
+		// 2.获取当前用户的权限id列表
 		var roleAccessList []models.RoleAccess
-		var accessIds []int
-		var accessList []models.Access
+		var access models.Access
+		// 把权限id放在一个map类型的对象里面
+		roleAccessMap := make(map[int]int)
 		mysql.DB.Select("access_id").Where("role_id = ?", userInfo.RoleId).Find(&roleAccessList)
 		for _, v := range roleAccessList {
-			accessIds = append(accessIds, v.AccessId)
+			roleAccessMap[v.AccessId] = v.AccessId
 		}
-		mysql.DB.Where("id in (?)", accessIds).Preload("AccessItem").Find(&accessList)
-		// 3.当前访问的路由path匹配权限中的url
-		for _, v := range accessList {
-			if url != v.Url {
-				c.String(NOPERMISSIONSCODE, NOPERMISSIONSMSG)
-				c.Abort()
-				return
-			}
+		// 查询url对应的权限id
+		mysql.DB.Select("id").Where("url = ?", url).Find(&access)
+		// 3.匹配当前用户是否有访问当前路由的权限
+		if _, ok := roleAccessMap[access.Id]; !ok {
+			c.String(NOPERMISSIONSCODE, NOPERMISSIONSMSG)
+			c.Abort()
+			return
 		}
 	}
 

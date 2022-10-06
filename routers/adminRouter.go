@@ -22,7 +22,7 @@ func AdminRouterInit(r *gin.Engine) {
 		adminRouter.GET("/", admin.IndexController{}.Index)
 
 		// 管理员列表
-		adminRouter.GET("/manager/list", admin.ManagerController{}.List)
+		adminRouter.GET("/manager", admin.ManagerController{}.List)
 		// 添加管理员
 		adminRouter.POST("/manager", admin.ManagerController{}.Add)
 		// 修改管理员
@@ -31,23 +31,32 @@ func AdminRouterInit(r *gin.Engine) {
 		adminRouter.DELETE("/manager", admin.ManagerController{}.Delete)
 
 		// 角色列表
-		adminRouter.GET("/role/list", admin.RoleController{}.List)
+		adminRouter.GET("/role", admin.RoleController{}.List)
 		// 添加角色
-		adminRouter.POST("/role/add", admin.RoleController{}.Add)
+		adminRouter.POST("/role", admin.RoleController{}.Add)
 		// 修改角色
-		adminRouter.PUT("/role/update", admin.RoleController{}.Update)
+		adminRouter.PUT("/role", admin.RoleController{}.Update)
 		// 删除角色
-		adminRouter.DELETE("/role/delete", admin.RoleController{}.Delete)
+		adminRouter.DELETE("/role", admin.RoleController{}.Delete)
 		// 角色授权
 		adminRouter.POST("/role/auth", admin.RoleController{}.Auth)
 
 		// 权限列表
-		adminRouter.GET("/access/list", admin.AccessController{}.List)
+		adminRouter.GET("/access", admin.AccessController{}.List)
 		// 添加权限
 		adminRouter.POST("/access", admin.AccessController{}.Add)
 		// 修改权限
 		adminRouter.PUT("/access", admin.AccessController{}.Update)
 		// 删除权限
 		adminRouter.DELETE("/access", admin.AccessController{}.Delete)
+
+		// 轮播图列表
+		adminRouter.GET("/focus", admin.FocusController{}.List)
+		// 添加轮播图
+		adminRouter.POST("/focus", admin.FocusController{}.Add)
+		// 修改轮播图
+		adminRouter.PUT("/focus", admin.FocusController{}.Update)
+		// 删除轮播图
+		adminRouter.DELETE("/focus", admin.FocusController{}.Delete)
 	}
 }
