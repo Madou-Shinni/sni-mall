@@ -3,7 +3,7 @@
 POST http://localhost:8080/admin/login
 Content-Type: application/x-www-form-urlencoded
 
-captchaId=FFQkHBFv9Sz1DdY3VYRg&verifyValue=t4vg&username=admin&password=123456
+captchaId=qNG6Bac92CsOamJk8JHX&verifyValue=2cgc&username=admin&password=123456
 
 ###
 ## 测试jwt权限校验
@@ -64,4 +64,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c
 GET http://localhost:8080/admin
 Content-Type: application/x-www-form-urlencoded
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjY1MDMzOTc5LCJpc3MiOiJ5dW1jbG9yIn0.MMndb6XzoxOhgZXK_DWrKY1QXkZdXJi1omWeiRFNwoY
+
+###
+## 测试轮播图列表
+GET http://localhost:8080/admin/focus
+Content-Type: application/x-www-form-urlencoded
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VybmFtZSI6ImFkbWluIiwiZXhwIjoxNjY1MTA4NjcyLCJpc3MiOiJ5dW1jbG9yIn0.g-GwPT8bPq7ei0sd7OMnkNMLMcmz_PZ3py_3nr_BAcg
+
 
