@@ -114,5 +114,10 @@ func AdminRouterInit(r *gin.Engine) {
 		adminRouter.PUT("/nav/update", admin.NavController{}.Update)
 		// 删除导航
 		adminRouter.DELETE("/nav/delete", admin.NavController{}.Delete)
+
+		// 获取系统配置
+		adminRouter.GET("/setting", admin.SettingController{}.Get)
+		// 修改系统配置
+		adminRouter.PUT("/nav/update", admin.SettingController{}.Update)
 	}
 }
