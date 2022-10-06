@@ -81,6 +81,12 @@ func Int64ToString(int64 int64) string {
 	return str
 }
 
+// Float64 将string转换成float64
+func Float64(str string) (float64, error) {
+	n, err := strconv.ParseFloat(str, 64)
+	return n, err
+}
+
 // UploadImg 上传图片
 func UploadImg(c *gin.Context, picName string) (string, error) {
 	// 1、获取上传的文件
