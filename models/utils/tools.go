@@ -5,7 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	. "github.com/hunterhug/go_image"
+	qrcode "github.com/skip2/go-qrcode"
 	"io"
+	"io/ioutil"
 	"os"
 	"path"
 	"strconv"
@@ -114,4 +117,54 @@ func UploadImg(c *gin.Context, picName string) (string, error) {
 	dst := path.Join(dir, fileName)
 	c.SaveUploadedFile(file, dst)
 	return dst, nil
+}
+
+// QrcodeSava 生成二维码并且保存成文件
+func QrcodeSava(c *gin.Context) {
+	savePath := "static/upload/qrcode.png"
+	err := qrcode.WriteFile("https://www.itying.com", qrcode.Medium, 556, savePath)
+	if err != nil {
+		c.String(200, "生成二维码失败")
+		return
+	}
+	file, _ := ioutil.ReadFile(savePath)
+	c.String(200, string(file))
+}
+
+// QrcodeByte 生成二维码字节
+func QrcodeByte(c *gin.Context) {
+	var png []byte
+	png, err := qrcode.Encode("https://www.itying.com", qrcode.Medium, 256)
+	if err != nil {
+		c.String(200, "生成二维码失败")
+		return
+	}
+	c.String(200, string(png))
+}
+
+// Thumbnail1 图像宽度 进行等比例缩放
+func Thumbnail1(c *gin.Context) {
+	//按宽度进行比例缩放，输入输出都是文件
+	//filename string, savepath string, width int
+	filename := "static/upload/0.png"
+	savePath := "static/upload/0_600.png"
+	err := ScaleF2F(filename, savePath, 600)
+	if err != nil {
+		c.String(200, "生成图片失败")
+		return
+	}
+	c.String(200, "Thumbnail1 成功")
+}
+
+// Thumbnail2 图像宽高 都进行等比例缩放
+func Thumbnail2(c *gin.Context) {
+	filename := "static/upload/tao.jpg"
+	savePath := "static/upload/tao_400.png"
+	//按宽度和高度进行比例缩放，输入和输出都是文件
+	err := ThumbnailF2F(filename, savePath, 400, 400)
+	if err != nil {
+		c.String(200, "生成图片失败")
+		return
+	}
+	c.String(200, "Thumbnail2 成功")
 }
