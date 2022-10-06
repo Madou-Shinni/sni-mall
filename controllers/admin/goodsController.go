@@ -37,7 +37,7 @@ func (con GoodsController) List(c *gin.Context) {
 	}
 	var goodsList []models.Goods
 	// 分页查询商品列表
-	mysql.DB.Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&goodsList)
+	mysql.DB.Where("is_delete = 0").Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&goodsList)
 	// 获取总数量
 	var count int64
 	mysql.DB.Table("goods").Count(&count)
