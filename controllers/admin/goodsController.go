@@ -18,7 +18,7 @@ type GoodsController struct {
 
 const (
 	FailedAdd       = "添加失败！"
-	FiledUpdate     = "修改失败！"
+	FailedUpdate    = "修改失败！"
 	DefaultPageNum  = "1"  // 默认当前页为第1页
 	DefaultPageSize = "10" // 默认每页查询的数量10条
 	MaxPageSize     = 1000 // 最大限制数量1000条
@@ -344,7 +344,7 @@ func (con GoodsController) Update(c *gin.Context) {
 
 	err3 := mysql.DB.Save(&goods).Error
 	if err3 != nil {
-		con.Error(c, FiledUpdate)
+		con.Error(c, FailedUpdate)
 		return
 	}
 
