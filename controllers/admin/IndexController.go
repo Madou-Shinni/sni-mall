@@ -2,6 +2,7 @@ package admin
 
 import (
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	request "xiaomi-mall/controllers"
 	"xiaomi-mall/models"
 	mysql "xiaomi-mall/models/mysql"
@@ -25,6 +26,8 @@ func (con IndexController) Index(c *gin.Context) {
 	for _, v := range roleAccessList {
 		accessIds = append(accessIds, v.AccessId)
 	}
-	mysql.DB.Where("id in (?)", accessIds).Preload("AccessItem").Find(&accessList)
+	mysql.DB.Where("id in (?)", accessIds).
+		Preload("AccessItem", // 连接查询排序
+			func(db *gorm.DB) *gorm.DB { return db.Order("access.sort DESC") }).Find(&accessList)
 	con.SuccessAndData(c, accessList)
 }
