@@ -3,6 +3,7 @@ package admin
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"math"
 	"net/http"
 	"strings"
 	"sync"
@@ -16,8 +17,11 @@ type GoodsController struct {
 }
 
 const (
-	FailedAdd   = "添加失败！"
-	FiledUpdate = "修改失败！"
+	FailedAdd       = "添加失败！"
+	FiledUpdate     = "修改失败！"
+	DefaultPageNum  = "1"  // 默认当前页为第1页
+	DefaultPageSize = "10" // 默认每页查询的数量10条
+	MaxPageSize     = 1000 // 最大限制数量1000条
 )
 
 var wg sync.WaitGroup
@@ -25,7 +29,25 @@ var wg sync.WaitGroup
 // List 商品列表（分页）
 func (con GoodsController) List(c *gin.Context) {
 	// 获取当前页
-	con.Success(c)
+	pageNum, _ := utils.StringToInt(c.DefaultQuery("pageNum", DefaultPageNum))
+	// 每页查询的数量
+	pageSize, _ := utils.StringToInt(c.DefaultQuery("pageSize", DefaultPageSize))
+	if pageSize > 1000 {
+		pageSize = MaxPageSize
+	}
+	var goodsList []models.Goods
+	// 分页查询商品列表
+	mysql.DB.Offset((pageNum - 1) * pageSize).Limit(pageSize).Find(&goodsList)
+	// 获取总数量
+	var count int64
+	mysql.DB.Table("goods").Count(&count)
+
+	goodsPage := make(map[string]interface{})
+	goodsPage["goodsList"] = goodsList
+	// 注意：必须使用float64类型
+	goodsPage["totalPages"] = math.Ceil(float64(count) / float64(pageSize)) // 总数÷每页数量 向上取整得到总页数
+
+	con.SuccessAndData(c, goodsPage)
 }
 
 // GoodsInfoList 商品信息列表（商品分类、颜色、类型列表）
