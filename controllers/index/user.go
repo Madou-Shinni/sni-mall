@@ -188,3 +188,42 @@ func (con UserController) Register(c *gin.Context) {
 		"token": token,
 	})
 }
+
+// Login 登录
+func (con UserController) Login(c *gin.Context) {
+	phone := c.PostForm("phone")
+	password := c.PostForm("password")
+	captchaId := c.Query("captchaId")
+	verifyCode := c.PostForm("verifyCode")
+	// 验证验证码
+	if flag := models.CaptVerify(captchaId, verifyCode); !flag {
+		c.JSON(http.StatusOK, gin.H{
+			"success": false,
+			"message": "验证码输入错误，请重试",
+		})
+		return
+	}
+	// 查询数据库
+	user := models.User{}
+	mysql.DB.Where("phone = ?", phone).Find(&user)
+
+	// 比较加密密码
+	md5Pwd := utils.Md5(password)
+	if user.Password != md5Pwd {
+		c.String(http.StatusOK, "密码错误！")
+		return
+	}
+
+	// 登录
+	token, err := utils.GenToken(int64(user.Id), phone)
+	if err != nil {
+		c.String(http.StatusOK, "登陆失败，请稍后再试！")
+		return
+	}
+	// 返回用户信息前先清空密码
+	user.Password = ""
+	c.JSON(http.StatusOK, gin.H{
+		"token":    token,
+		"userInfo": user,
+	})
+}
