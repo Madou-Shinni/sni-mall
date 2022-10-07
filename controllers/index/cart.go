@@ -2,6 +2,7 @@ package index
 
 import (
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"xiaomi-mall/models"
 	mysql "xiaomi-mall/models/mysql"
 	"xiaomi-mall/models/utils"
@@ -103,4 +104,119 @@ func (con CartController) AddCart(c *gin.Context) {
 
 	c.String(200, "加入购物车成功")
 
+}
+
+// IncCart 增加购物车数量
+func (con CartController) IncCart(c *gin.Context) {
+	//1、获取客户端穿过来的数据
+	goodsId, err := utils.StringToInt(c.Query("goods_id"))
+	goodsColor := c.Query("goods_color")
+	GoodsAttr := ""
+
+	//定义返回的数据
+	var allPrice float64
+	var currentPrice float64
+	var num int
+
+	var response gin.H
+	//2、判断数据是否合法
+	if err != nil {
+		response = gin.H{
+			"success": false,
+			"message": "传入参数错误",
+		}
+	} else {
+		var cartList []models.Cart
+		models.Cookie.Get(c, "cartList", &cartList)
+		if len(cartList) > 0 {
+			for i := 0; i < len(cartList); i++ {
+				if cartList[i].Id == goodsId && cartList[i].GoodsColor == goodsColor && cartList[i].GoodsAttr == GoodsAttr {
+					cartList[i].Num = cartList[i].Num + 1
+					currentPrice = float64(cartList[i].Num) * cartList[i].Price
+					num = cartList[i].Num
+				}
+
+				if cartList[i].Checked {
+					allPrice += cartList[i].Price * float64(cartList[i].Num)
+				}
+
+			}
+			//重新写入数据
+			models.Cookie.Set(c, "cartList", cartList)
+
+			response = gin.H{
+				"success":      true,
+				"message":      "更新数据成功",
+				"allPrice":     allPrice,
+				"num":          num,
+				"currentPrice": currentPrice,
+			}
+		} else {
+			response = gin.H{
+				"success": false,
+				"message": "传入参数错误",
+			}
+		}
+	}
+
+	c.JSON(http.StatusOK, response)
+
+}
+
+// DecCart 减少购物车数量
+func (con CartController) DecCart(c *gin.Context) {
+	//1、获取客户端穿过来的数据
+	goodsId, err := utils.StringToInt(c.Query("goods_id"))
+	goodsColor := c.Query("goods_color")
+	GoodsAttr := ""
+
+	//定义返回的数据
+	var allPrice float64
+	var currentPrice float64
+	var num int
+
+	var response gin.H
+	//2、判断数据是否合法
+	if err != nil {
+		response = gin.H{
+			"success": false,
+			"message": "传入参数错误",
+		}
+	} else {
+		var cartList []models.Cart
+		models.Cookie.Get(c, "cartList", &cartList)
+		if len(cartList) > 0 {
+			for i := 0; i < len(cartList); i++ {
+				if cartList[i].Id == goodsId && cartList[i].GoodsColor == goodsColor && cartList[i].GoodsAttr == GoodsAttr {
+					if cartList[i].Num > 1 {
+						cartList[i].Num = cartList[i].Num - 1
+					}
+					currentPrice = float64(cartList[i].Num) * cartList[i].Price
+					num = cartList[i].Num
+				}
+
+				if cartList[i].Checked {
+					allPrice += cartList[i].Price * float64(cartList[i].Num)
+				}
+
+			}
+			//重新写入数据
+			models.Cookie.Set(c, "cartList", cartList)
+
+			response = gin.H{
+				"success":      true,
+				"message":      "更新数据成功",
+				"allPrice":     allPrice,
+				"num":          num,
+				"currentPrice": currentPrice,
+			}
+		} else {
+			response = gin.H{
+				"success": false,
+				"message": "传入参数错误",
+			}
+		}
+	}
+
+	c.JSON(http.StatusOK, response)
 }
