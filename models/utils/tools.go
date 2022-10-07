@@ -11,6 +11,7 @@ import (
 	"gopkg.in/ini.v1"
 	"io"
 	"io/ioutil"
+	"math/rand"
 	"mime/multipart"
 	"os"
 	"path"
@@ -25,6 +26,14 @@ import (
 const (
 	FailedFileUpload = "文件上传失败！"
 )
+
+// Rand 生成随机数 生成0到v-1的随机数
+func Rand(v int) int {
+	//将时间戳设置成种子数（真正随机）
+	rand.Seed(time.Now().UnixNano())
+	//过期时间生成0-99之间的随机数 rand.Intn(100)固定随机，需要配合rand.Seed使用
+	return rand.Intn(v)
+}
 
 // UnixToTime 时间戳转换成日期
 func UnixToTime(timestamp int) string {
