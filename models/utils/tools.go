@@ -35,6 +35,16 @@ func Rand(v int) int {
 	return rand.Intn(v)
 }
 
+// RandCode 随机验证码4位
+func RandCode() string {
+	var str string
+	for i := 0; i < 4; i++ {
+		v := IntToString(Rand(10))
+		str += v
+	}
+	return str
+}
+
 // UnixToTime 时间戳转换成日期
 func UnixToTime(timestamp int) string {
 	t := time.Unix(int64(timestamp), 0)
