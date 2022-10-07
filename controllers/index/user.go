@@ -146,3 +146,45 @@ func (con UserController) SendCode(c *gin.Context) {
 
 	}
 }
+
+// Register 注册
+func (con UserController) Register(c *gin.Context) {
+	phone := c.PostForm("phone")
+	smsCode := c.PostForm("smsCode") // 短信验证码
+	// 验证短信验证码
+	if b := utils.VerifyCode(phone, smsCode); !b {
+		c.String(http.StatusOK, "验证码错误或者失效！")
+		return
+	}
+	password := c.PostForm("password")
+	confirmPwd := c.PostForm("confirm_password") // 确认密码
+	if password != confirmPwd {
+		c.String(http.StatusOK, "密码和确认密码不相同，请重新输入！")
+		return
+	}
+
+	// 完成注册
+	user := models.User{
+		Phone:    phone,
+		Password: utils.Md5(password),
+		AddTime:  int(utils.GetUnix()),
+		LastIp:   c.ClientIP(),
+		Email:    "",
+		Status:   1,
+	}
+	if sqlErr := mysql.DB.Create(&user).Error; sqlErr != nil {
+		c.String(http.StatusOK, "注册失败，请稍后再试！")
+		return
+	}
+	// 删除redis中的短信验证码
+	redis.CacheDB.Del(phone)
+	// 执行登录
+	token, err := utils.GenToken(int64(user.Id), phone)
+	if err != nil {
+		c.String(http.StatusOK, "系统繁忙，登陆失败！")
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"token": token,
+	})
+}

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"xiaomi-mall/models/redis"
 
 	ypclnt "github.com/yunpian/yunpian-go-sdk/sdk"
 )
@@ -24,4 +25,13 @@ func SMSByVoice(phone string, code string) {
 	param[ypclnt.CODE] = code
 	r := clnt.Voice().Send(param)
 	fmt.Println(r)
+}
+
+// VerifyCode 验证短信验证码 失败返回false成功返回true
+func VerifyCode(phone string, codeStr string) bool {
+	code, err := redis.CacheDB.GetString(phone)
+	if err != nil || code == "" || code != codeStr {
+		return false
+	}
+	return true
 }
