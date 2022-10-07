@@ -193,7 +193,7 @@ func (con UserController) Register(c *gin.Context) {
 func (con UserController) Login(c *gin.Context) {
 	phone := c.PostForm("phone")
 	password := c.PostForm("password")
-	captchaId := c.Query("captchaId")
+	captchaId := c.PostForm("captchaId")
 	verifyCode := c.PostForm("verifyCode")
 	// 验证验证码
 	if flag := models.CaptVerify(captchaId, verifyCode); !flag {
