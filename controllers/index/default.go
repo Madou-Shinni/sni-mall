@@ -39,11 +39,18 @@ func (con DefaultController) Index(c *gin.Context) {
 		middleNavList[i].GoodsItems = goodsList
 	}
 
+	//手机
+	phoneList := models.GetGoodsByCategory(1, "best", 8)
+	//配件
+	otherList := models.GetGoodsByCategory(9, "all", 1)
+
 	c.JSON(http.StatusOK, gin.H{
 		"topNavList":    topNavList,
 		"focusList":     focusList,
 		"goodsCateList": goodsCateList,
 		"middleNavList": middleNavList,
+		"phoneList":     phoneList,
+		"otherList":     otherList,
 	})
 
 }

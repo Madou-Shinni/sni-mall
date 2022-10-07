@@ -71,6 +71,31 @@ func Md5(str string) string {
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
+// Substr 截取字符串
+func Substr(str string, start int, end int) string {
+	rs := []rune(str)
+	rl := len(rs)
+	if start < 0 {
+		start = 0
+	}
+	if start > rl {
+		start = 0
+	}
+
+	if end < 0 {
+		end = rl
+	}
+	if end > rl {
+		end = rl
+	}
+	if start > end {
+		start, end = end, start
+	}
+
+	return string(rs[start:end])
+
+}
+
 // StringToInt 将string转换成int
 func StringToInt(str string) (int, error) {
 	int, err := strconv.Atoi(str)
