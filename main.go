@@ -16,6 +16,7 @@ func main() {
 
 	// 注册路由
 	routers.AdminRouterInit(r)
+	routers.IndexRouterInit(r)
 
 	// 运行
 	r.Run(":8080")
