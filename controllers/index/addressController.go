@@ -50,12 +50,23 @@ func (con AddressController) Add(c *gin.Context) {
 
 // Update 修改收货地址
 func (con AddressController) Update(c *gin.Context) {
+	uid := int(GetCurrentUserId(c))
 	address := models.Address{}
 	if err2 := c.ShouldBind(&address); err2 != nil {
 		c.JSON(http.StatusOK, "参数错误，请你稍后重试！")
 		return
 	}
 
+	if address.DefaultAddress == 1 {
+		// 如果默认收货地址为1，其他地址修改为0
+		// 修改单列
+		err := mysql.DB.Model(models.Address{}).Where("uid = ?", uid).
+			Update("default_address", 0).Error
+		if err != nil {
+			c.JSON(http.StatusOK, "修改失败，请你稍后重试！")
+			return
+		}
+	}
 	if err := mysql.DB.Save(&address).Error; err != nil {
 		c.JSON(http.StatusOK, "修改失败，请你稍后重试！")
 		return
