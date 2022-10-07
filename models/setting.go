@@ -16,6 +16,7 @@ type Setting struct {
 	EndPoint        string `form:"end_point" json:"endPoint,omitempty"`
 	BucketName      string `form:"bucket_name" json:"bucketName,omitempty"`
 	OssStatus       int    `form:"oss_status" json:"ossStatus,omitempty"`
+	ThumbnailSize   string `form:"thumbnail_size" json:"thumbnailSize,omitempty"`
 }
 
 func (Setting) TableName() string {

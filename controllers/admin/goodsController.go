@@ -109,6 +109,16 @@ func (con GoodsController) Add(c *gin.Context) {
 
 	//3、上传图片   生成缩略图
 	goodsImg, _ := utils.UploadImg(c, "goods_img")
+	if len(goodsImg) > 0 {
+		// 不是oss上传时才生成缩略图
+		if utils.GetOssStatus() != 1 {
+			wg.Add(1)
+			go func() {
+				utils.ResizeGoodsImage(goodsImg)
+				wg.Done()
+			}()
+		}
+	}
 
 	//4、增加商品数据
 
@@ -340,6 +350,14 @@ func (con GoodsController) Update(c *gin.Context) {
 	goodsImg, err2 := utils.UploadImg(c, "goods_img")
 	if err2 == nil && len(goodsImg) > 0 {
 		goods.GoodsImg = goodsImg
+		// 不是oss上传时才生成缩略图
+		if utils.GetOssStatus() != 1 {
+			wg.Add(1)
+			go func() {
+				utils.ResizeGoodsImage(goodsImg)
+				wg.Done()
+			}()
+		}
 	}
 
 	err3 := mysql.DB.Save(&goods).Error

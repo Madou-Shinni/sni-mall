@@ -4,15 +4,26 @@ import (
 	"crypto/md5"
 	"errors"
 	"fmt"
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/gin-gonic/gin"
 	. "github.com/hunterhug/go_image"
 	qrcode "github.com/skip2/go-qrcode"
+	"gopkg.in/ini.v1"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"os"
 	"path"
+	"reflect"
 	"strconv"
+	"strings"
 	"time"
+	"xiaomi-mall/models"
+	mysql "xiaomi-mall/models/mysql"
+)
+
+const (
+	FailedFileUpload = "文件上传失败！"
 )
 
 // UnixToTime 时间戳转换成日期
@@ -90,8 +101,8 @@ func Float64(str string) (float64, error) {
 	return n, err
 }
 
-// UploadImg 上传图片
-func UploadImg(c *gin.Context, picName string) (string, error) {
+// LocalUploadImg 上传图片到本地
+func LocalUploadImg(c *gin.Context, picName string) (string, error) {
 	// 1、获取上传的文件
 	file, err1 := c.FormFile(picName)
 	if err1 != nil {
@@ -142,29 +153,122 @@ func QrcodeByte(c *gin.Context) {
 	c.String(200, string(png))
 }
 
-// Thumbnail1 图像宽度 进行等比例缩放
-func Thumbnail1(c *gin.Context) {
-	//按宽度进行比例缩放，输入输出都是文件
-	//filename string, savepath string, width int
-	filename := "static/upload/0.png"
-	savePath := "static/upload/0_600.png"
-	err := ScaleF2F(filename, savePath, 600)
-	if err != nil {
-		c.String(200, "生成图片失败")
-		return
+// ResizeGoodsImage 生成商品缩略图
+func ResizeGoodsImage(filename string) {
+	extname := path.Ext(filename)                          // 获取后缀
+	thumbnailSize := GetSettingFromColumn("ThumbnailSize") // 获取列名的属性值
+	thumbnailSizeSlice := strings.Split(thumbnailSize, ",")
+	// static/upload/tao_400.png
+	// 生成后 static/upload/tao_400.png_100x100.png
+	for i := 0; i < len(thumbnailSizeSlice); i++ {
+		w, _ := StringToInt(thumbnailSizeSlice[i])
+		// 拼接字符串
+		savePath := "static/upload/tao_400.png" + "_" + thumbnailSizeSlice[i] + "x" + thumbnailSizeSlice[i] + extname
+		//按宽度和高度进行比例缩放，输入和输出都是文件
+		err := ThumbnailF2F(filename, savePath, w, w)
+		if err != nil {
+			fmt.Println(err) // 日志
+		}
 	}
-	c.String(200, "Thumbnail1 成功")
 }
 
-// Thumbnail2 图像宽高 都进行等比例缩放
-func Thumbnail2(c *gin.Context) {
-	filename := "static/upload/tao.jpg"
-	savePath := "static/upload/tao_400.png"
-	//按宽度和高度进行比例缩放，输入和输出都是文件
-	err := ThumbnailF2F(filename, savePath, 400, 400)
-	if err != nil {
-		c.String(200, "生成图片失败")
-		return
+// GetSettingFromColumn 通过列获取值
+func GetSettingFromColumn(columnName string) string {
+	//redis file
+	setting := models.Setting{}
+	mysql.DB.First(&setting)
+	//反射来获取
+	v := reflect.ValueOf(setting)
+	val := v.FieldByName(columnName).String()
+	return val
+}
+
+// GetOssStatus 获取Oss的状态
+func GetOssStatus() int {
+	config, iniErr := ini.Load("./conf/app.ini")
+	if iniErr != nil {
+		fmt.Printf("Fail to read file: %v", iniErr)
+		os.Exit(1)
 	}
-	c.String(200, "Thumbnail2 成功")
+	ossStatus, _ := StringToInt(config.Section("oss").Key("status").String())
+	return ossStatus
+}
+
+// UploadImg 上传图片(自动判断oss还是本地)
+func UploadImg(c *gin.Context, picName string) (string, error) {
+	ossStatus := GetOssStatus()
+	// 查看oss是否开启
+	if ossStatus == 1 {
+		return OssUploadImg(c, picName)
+	} else {
+		return LocalUploadImg(c, picName)
+	}
+
+}
+
+// OssUploadImg 上传图片到Oss（内部调用了OssUpload）
+func OssUploadImg(c *gin.Context, picName string) (string, error) {
+	// 1、获取上传的文件
+	file, err := c.FormFile(picName)
+
+	if err != nil {
+		return "", err
+	}
+
+	// 2、获取后缀名 判断类型是否正确  .jpg .png .gif .jpeg
+	extName := path.Ext(file.Filename)
+	allowExtMap := map[string]bool{
+		".jpg":  true,
+		".png":  true,
+		".gif":  true,
+		".jpeg": true,
+	}
+
+	if _, ok := allowExtMap[extName]; !ok {
+		return "", errors.New("文件后缀名不合法")
+	}
+
+	// 3、定义图片保存目录  static/upload/20210624
+
+	day := GetDay()
+	dir := "static/upload/" + day
+
+	// 4、生成文件名称和文件保存的目录   111111111111.jpeg
+	fileName := strconv.FormatInt(GetUnixNano(), 10) + extName
+
+	// 5、执行上传
+	dst := path.Join(dir, fileName)
+
+	OssUpload(file, dst)
+	return dst, nil
+
+}
+
+// OssUpload Oss上传
+func OssUpload(file *multipart.FileHeader, dst string) (string, error) {
+
+	f, err := file.Open()
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+
+	// 创建OSSClient实例。
+	client, err := oss.New("oss-cn-beijing.aliyuncs.com", "GJoqWHXB2c9S9gwP", "Lgf3weXuWITUUb17vDJfveg1jmKEe9")
+	if err != nil {
+		return "", err
+	}
+
+	// 获取存储空间。
+	bucket, err := client.Bucket("beego")
+	if err != nil {
+		return "", err
+	}
+
+	// 上传文件流。
+	err = bucket.PutObject(dst, f)
+	if err != nil {
+		return "", err
+	}
+	return dst, nil
 }
