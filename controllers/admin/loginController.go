@@ -1,18 +1,25 @@
 package admin
 
 import (
-	"fmt"
+	"context"
 	"github.com/gin-gonic/gin"
+	"go-micro.dev/v4/util/log"
 	"net/http"
 	"xiaomi-mall/models"
 	mysql "xiaomi-mall/models/mysql"
 	utils "xiaomi-mall/models/utils"
+	pb "xiaomi-mall/proto/captcha"
 )
 
 const (
 	FailedCaptVerify = "验证码错误！"
 	FailedLogin      = "用户名或密码错误！"
 	FailedSystem     = "系统故障请联系管理员！"
+)
+
+var (
+	service = "captcha"
+	version = "latest"
 )
 
 type LoginController struct {
@@ -63,12 +70,26 @@ func (con LoginController) Logout(c *gin.Context) {
 
 // Captcha 获取验证码
 func (con LoginController) Captcha(c *gin.Context) {
-	id, b64s, err := models.CaptMake()
+	//id, b64s, err := models.CaptMake()
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+
+	//c.JSON(http.StatusOK, gin.H{
+	//	"captchaId":    id,
+	//	"captchaImage": b64s,
+	//})
+
+	// 获取captchaClient
+	captchaClient := pb.NewCaptchaService(service, models.CaptchaClient)
+	// 远程调用 service
+	rps, err := captchaClient.GetCaptcha(context.Background(), &pb.GetCaptchaRequest{})
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"captchaId":    id,
-		"captchaImage": b64s,
+		"captchaId":    rps.Id,
+		"captchaImage": rps.B64S,
 	})
 }
