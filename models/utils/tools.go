@@ -45,6 +45,12 @@ func RandCode() string {
 	return str
 }
 
+// GetOrderId 获取订单随机数
+func GetOrderId() string {
+	template := "20160102150405"
+	return time.Now().Format(template) + RandCode()
+}
+
 // UnixToTime 时间戳转换成日期
 func UnixToTime(timestamp int) string {
 	t := time.Unix(int64(timestamp), 0)
