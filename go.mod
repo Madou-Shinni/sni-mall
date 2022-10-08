@@ -18,6 +18,8 @@ require (
 	gopkg.in/ini.v1 v1.67.0
 	gorm.io/driver/mysql v1.3.6
 	gorm.io/gorm v1.23.10
+	github.com/go-micro/plugins/v4/registry/consul v1.1.0
+	go-micro.dev/v4 v4.8.0
 )
 
 require (

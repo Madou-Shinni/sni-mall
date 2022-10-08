@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package captcha;
+
+option go_package = "./proto/captcha";
+
+service Captcha {
+	rpc GetCaptcha(GetCaptchaRequest) returns (GetCaptchaResponse) {}
+	rpc VerifyCaptcha(CaptVerifyRequest) returns (CaptVerifyResponse) {}
+}
+
+message GetCaptchaRequest {
+
+}
+
+message GetCaptchaResponse {
+	string id = 1;
+	string b64s = 2;
+}
+
+message CaptVerifyRequest {
+	string id = 1;
+	string capt = 2;
+}
+
+message CaptVerifyResponse {
+	bool flag = 1;
+}
