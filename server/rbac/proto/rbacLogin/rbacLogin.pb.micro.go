@@ -27,32 +27,32 @@ var _ context.Context
 var _ client.Option
 var _ server.Option
 
-// Api Endpoints for Rbac service
+// Api Endpoints for RbacLogin service
 
-func NewRbacEndpoints() []*api.Endpoint {
+func NewRbacLoginEndpoints() []*api.Endpoint {
 	return []*api.Endpoint{}
 }
 
-// Client API for Rbac service
+// Client API for RbacLogin service
 
-type RbacService interface {
+type RbacLoginService interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...client.CallOption) (*LoginResponse, error)
 }
 
-type rbacService struct {
+type rbacLoginService struct {
 	c    client.Client
 	name string
 }
 
-func NewRbacService(name string, c client.Client) RbacService {
-	return &rbacService{
+func NewRbacLoginService(name string, c client.Client) RbacLoginService {
+	return &rbacLoginService{
 		c:    c,
 		name: name,
 	}
 }
 
-func (c *rbacService) Login(ctx context.Context, in *LoginRequest, opts ...client.CallOption) (*LoginResponse, error) {
-	req := c.c.NewRequest(c.name, "Rbac.Login", in)
+func (c *rbacLoginService) Login(ctx context.Context, in *LoginRequest, opts ...client.CallOption) (*LoginResponse, error) {
+	req := c.c.NewRequest(c.name, "RbacLogin.Login", in)
 	out := new(LoginResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -61,27 +61,27 @@ func (c *rbacService) Login(ctx context.Context, in *LoginRequest, opts ...clien
 	return out, nil
 }
 
-// Server API for Rbac service
+// Server API for RbacLogin service
 
-type RbacHandler interface {
+type RbacLoginHandler interface {
 	Login(context.Context, *LoginRequest, *LoginResponse) error
 }
 
-func RegisterRbacHandler(s server.Server, hdlr RbacHandler, opts ...server.HandlerOption) error {
-	type rbac interface {
+func RegisterRbacLoginHandler(s server.Server, hdlr RbacLoginHandler, opts ...server.HandlerOption) error {
+	type rbacLogin interface {
 		Login(ctx context.Context, in *LoginRequest, out *LoginResponse) error
 	}
-	type Rbac struct {
-		rbac
+	type RbacLogin struct {
+		rbacLogin
 	}
-	h := &rbacHandler{hdlr}
-	return s.Handle(s.NewHandler(&Rbac{h}, opts...))
+	h := &rbacLoginHandler{hdlr}
+	return s.Handle(s.NewHandler(&RbacLogin{h}, opts...))
 }
 
-type rbacHandler struct {
-	RbacHandler
+type rbacLoginHandler struct {
+	RbacLoginHandler
 }
 
-func (h *rbacHandler) Login(ctx context.Context, in *LoginRequest, out *LoginResponse) error {
-	return h.RbacHandler.Login(ctx, in, out)
+func (h *rbacLoginHandler) Login(ctx context.Context, in *LoginRequest, out *LoginResponse) error {
+	return h.RbacLoginHandler.Login(ctx, in, out)
 }

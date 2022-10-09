@@ -43,7 +43,7 @@ func (con LoginController) Login(c *gin.Context) {
 		//result := mysql.DB.Where("username = ? AND password = ?", username, password).First(&userInfo).RowsAffected // 返回找到的记录数
 
 		// 调用rbac微服务
-		rbacClient := pbRbac.NewRbacService("rbac", models.RbacClient)
+		rbacClient := pbRbac.NewRbacLoginService("rbac", models.RbacClient)
 		rsp, _ := rbacClient.Login(context.Background(), &pbRbac.LoginRequest{
 			Username: username,
 			Password: password,
