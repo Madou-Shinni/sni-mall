@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package rbac;
+
+option go_package = "./proto/rbacRole";
+
+service RbacRole {
+  rpc RoleGet(RoleGetRequest) returns (RoleGetResponse) {}
+  rpc RoleAdd(RoleAddRequest) returns (RoleAddResponse) {}
+  rpc RoleUpdate(RoleUpdateRequest) returns (RoleUpdateResponse) {}
+  rpc RoleDelete(RoleDeleteRequest) returns (RoleDeleteResponse) {}
+}
+
+message RoleModel {
+  int64 Id = 1;
+  string Title = 2;
+  string Description = 3;
+  int64 Status = 4;
+  int64 AddTime = 5;
+}
+
+message RoleGetRequest {
+  int64 Id = 1;
+}
+
+message RoleGetResponse {
+  repeated RoleModel roleList = 1;
+}
+
+message RoleAddRequest {
+  RoleModel roleModel = 1;
+}
+
+message RoleAddResponse {
+  bool success = 1;
+  string msg = 2;
+}
+
+message RoleUpdateRequest {
+  RoleModel roleModel = 1;
+}
+
+message RoleUpdateResponse {
+  bool success = 1;
+  string msg = 2;
+}
+
+message RoleDeleteRequest {
+  int64 Id = 1;
+}
+
+message RoleDeleteResponse {
+  bool success = 1;
+  string msg = 2;
+}

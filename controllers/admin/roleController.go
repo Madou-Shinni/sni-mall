@@ -1,12 +1,13 @@
 package admin
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"strings"
-	"time"
 	"xiaomi-mall/models"
 	mysql "xiaomi-mall/models/mysql"
 	"xiaomi-mall/models/utils"
+	pbRole "xiaomi-mall/proto/rbacRole"
 )
 
 const (
@@ -24,9 +25,9 @@ type RoleController struct {
 
 // List 角色列表
 func (con RoleController) List(c *gin.Context) {
-	var roleList []models.Role
-	mysql.DB.Find(&roleList)
-	con.SuccessAndData(c, roleList)
+	roleClient := pbRole.NewRbacRoleService("rbac", models.RbacClient)
+	rsp, _ := roleClient.RoleGet(context.Background(), &pbRole.RoleGetRequest{})
+	con.SuccessAndData(c, rsp.RoleList)
 }
 
 // Add 添加角色
@@ -36,17 +37,20 @@ func (con RoleController) Add(c *gin.Context) {
 	if title == "" {
 		con.Error(c, TitleIsEmpty)
 	}
-	role := models.Role{}
-	role.Title = title
-	role.Description = description
-	role.Status = RoleStatusDefault
-	role.AddTime = int(time.Now().Unix())
 
-	err := mysql.DB.Create(&role).Error
+	roleModel := &pbRole.RoleModel{
+		Title:       title,
+		Description: description,
+		Status:      RoleStatusDefault,
+		AddTime:     utils.GetUnix(),
+	}
+	roleClient := pbRole.NewRbacRoleService("rbac", models.RbacClient)
+	rsp, err := roleClient.RoleAdd(context.Background(), &pbRole.RoleAddRequest{RoleModel: roleModel})
 	if err != nil {
-		con.Error(c, FailedAddRole)
+		con.Error(c, rsp.Msg)
 		return
 	}
+
 	con.Success(c)
 }
 
@@ -65,11 +69,21 @@ func (con RoleController) Update(c *gin.Context) {
 	}
 	role.Title = title
 	role.Description = description
-	sqlErr := mysql.DB.Save(&role).Error
-	if sqlErr != nil {
-		con.Error(c, FailedUpdateRole)
+
+	roleModel := &pbRole.RoleModel{
+		Id:          int64(idInt),
+		Title:       title,
+		Description: description,
+		Status:      1,
+		AddTime:     utils.GetUnix(),
+	}
+	roleClient := pbRole.NewRbacRoleService("rbac", models.RbacClient)
+	rsp, err := roleClient.RoleUpdate(context.Background(), &pbRole.RoleUpdateRequest{RoleModel: roleModel})
+	if err != nil {
+		con.Error(c, rsp.Msg)
 		return
 	}
+
 	con.Success(c)
 }
 
@@ -80,8 +94,14 @@ func (con RoleController) Delete(c *gin.Context) {
 		con.Error(c, ParameterError)
 		return
 	}
-	role := models.Role{Id: id}
-	mysql.DB.Delete(&role)
+
+	roleClient := pbRole.NewRbacRoleService("rbac", models.RbacClient)
+	rsp, err := roleClient.RoleDelete(context.Background(), &pbRole.RoleDeleteRequest{Id: int64(id)})
+	if err != nil {
+		con.Error(c, rsp.Msg)
+		return
+	}
+
 	con.Success(c)
 }
 

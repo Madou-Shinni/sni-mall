@@ -7,7 +7,8 @@ import (
 	"go-micro.dev/v4/registry"
 	"rbac/handler"
 	. "rbac/models/ini"
-	pb "rbac/proto/rbac"
+	pbLogin "rbac/proto/rbacLogin"
+	pbRole "rbac/proto/rbacRole"
 )
 
 var (
@@ -29,7 +30,10 @@ func main() {
 	)
 
 	// Register handler
-	if err := pb.RegisterRbacHandler(srv.Server(), new(handler.Rbac)); err != nil {
+	if err := pbLogin.RegisterRbacLoginHandler(srv.Server(), new(handler.RbacLogin)); err != nil {
+		logger.Fatal(err)
+	}
+	if err := pbRole.RegisterRbacRoleHandler(srv.Server(), new(handler.RbacRole)); err != nil {
 		logger.Fatal(err)
 	}
 	// Run service
