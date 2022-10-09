@@ -9,8 +9,27 @@ service RbacRole {
   rpc RoleAdd(RoleAddRequest) returns (RoleAddResponse) {}
   rpc RoleUpdate(RoleUpdateRequest) returns (RoleUpdateResponse) {}
   rpc RoleDelete(RoleDeleteRequest) returns (RoleDeleteResponse) {}
+  rpc RoleGetAuth(RoleGetAuthRequest) returns (RoleGetAuthResponse) {}
+  rpc RoleAuth(RoleAuthRequest) returns (RoleAuthResponse) {}
 }
 
+// 权限
+message AccessModel{
+  int64 id=1;
+  string moduleName =2;
+  string actionName=3;
+  int64 type=4;
+  string url=5;
+  int64 moduleId=6;
+  int64 sort =7;
+  string description=8;
+  int64 status=9;
+  int64 addTime=10;
+  bool checked = 11;
+  repeated AccessModel accessItem=12;
+}
+
+// 角色
 message RoleModel {
   int64 Id = 1;
   string Title = 2;
@@ -52,4 +71,23 @@ message RoleDeleteRequest {
 message RoleDeleteResponse {
   bool success = 1;
   string msg = 2;
+}
+
+// 查询角色授权
+message RoleGetAuthRequest {
+  int64 roleId = 1;
+}
+
+message RoleGetAuthResponse {
+  repeated AccessModel accessList = 1;
+}
+
+// 角色授权
+message RoleAuthRequest {
+  int64 roleId = 1;
+  repeated string accessIds = 2;
+}
+
+message RoleAuthResponse {
+  bool success = 1;
 }

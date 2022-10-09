@@ -113,24 +113,20 @@ func (con RoleController) Auth(c *gin.Context) {
 		con.Error(c, ParameterError)
 		return
 	}
-	// 先删除现在有的权限（避免表中有多个相同的权限）
-	var roleAccessList []models.RoleAccess
-	var roleAccess models.RoleAccess
-	mysql.DB.Select("id").Where("role_id = ?", roleId).Find(&roleAccessList) // 获取角色对应的权限
-	var ids []int                                                            // 用来存放所有角色对应权限的主键
-	for _, v := range roleAccessList {
-		ids = append(ids, v.Id)
-	}
-	mysql.DB.Where("id in (?)", ids).Delete(&roleAccess) // 批量删除权限
-
 	// 获取权限id（多个）
 	accessIds := c.PostFormArray("access_node[]")
-	for _, value := range accessIds {
-		intValue, _ := utils.StringToInt(value)
-		roleAccess = models.RoleAccess{RoleId: roleId, AccessId: intValue}
-		roleAccessList = append(roleAccessList, roleAccess)
+
+	// 调用微服务
+	roleClient := pbRole.NewRbacRoleService("rbac", models.RbacClient)
+	rsp, _ := roleClient.RoleAuth(context.Background(), &pbRole.RoleAuthRequest{
+		RoleId:    int64(roleId),
+		AccessIds: accessIds,
+	})
+	if !rsp.Success {
+		con.Error(c, "授权失败！")
+		return
 	}
-	mysql.DB.Create(&roleAccessList) // 批量插入权限
+
 	con.Success(c)
 }
 
@@ -143,28 +139,9 @@ func (con RoleController) GetAuth(c *gin.Context) {
 		return
 	}
 
-	// 2.获取所有权限
-	var accessList []models.Access
-	mysql.DB.Where("module_id = ?", TopModuleId).Preload("AccessItem").Find(&accessList)
+	// 调用微服务
+	roleClient := pbRole.NewRbacRoleService("rbac", models.RbacClient)
+	rsp, _ := roleClient.RoleGetAuth(context.Background(), &pbRole.RoleGetAuthRequest{RoleId: int64(roleId)})
 
-	// 3.获取当前角色拥有的权限，并把权限id放在一个map对象里
-	var roleAccessList []models.RoleAccess
-	mysql.DB.Where("role_id = ?", roleId).Find(&roleAccessList)
-	roleAccessMap := make(map[int]int)
-	for _, v := range roleAccessList {
-		roleAccessMap[v.AccessId] = v.AccessId
-	}
-
-	// 4.遍历所有的权限，判断当前权限的id是否在角色权限的map对象中，如果是就给当前对象加一个checked属性
-	// 注意：for range 无法直接修改，使用for i
-	for i := 0; i < len(accessList); i++ { // 遍历顶级模块
-		if _, ok := roleAccessMap[accessList[i].Id]; ok { // 如果存在checked=true
-			accessList[i].Checked = true
-		}
-		for j := 0; j < len(accessList[i].AccessItem); j++ { // 遍历二级模块
-			if _, ok := roleAccessMap[accessList[i].AccessItem[j].Id]; ok { // 如果存在checked=true
-				accessList[i].AccessItem[j].Checked = true
-			}
-		}
-	}
+	con.SuccessAndData(c, rsp.AccessList)
 }

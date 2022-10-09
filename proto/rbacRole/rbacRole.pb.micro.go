@@ -40,6 +40,8 @@ type RbacRoleService interface {
 	RoleAdd(ctx context.Context, in *RoleAddRequest, opts ...client.CallOption) (*RoleAddResponse, error)
 	RoleUpdate(ctx context.Context, in *RoleUpdateRequest, opts ...client.CallOption) (*RoleUpdateResponse, error)
 	RoleDelete(ctx context.Context, in *RoleDeleteRequest, opts ...client.CallOption) (*RoleDeleteResponse, error)
+	RoleGetAuth(ctx context.Context, in *RoleGetAuthRequest, opts ...client.CallOption) (*RoleGetAuthResponse, error)
+	RoleAuth(ctx context.Context, in *RoleAuthRequest, opts ...client.CallOption) (*RoleAuthResponse, error)
 }
 
 type rbacRoleService struct {
@@ -94,6 +96,26 @@ func (c *rbacRoleService) RoleDelete(ctx context.Context, in *RoleDeleteRequest,
 	return out, nil
 }
 
+func (c *rbacRoleService) RoleGetAuth(ctx context.Context, in *RoleGetAuthRequest, opts ...client.CallOption) (*RoleGetAuthResponse, error) {
+	req := c.c.NewRequest(c.name, "RbacRole.RoleGetAuth", in)
+	out := new(RoleGetAuthResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *rbacRoleService) RoleAuth(ctx context.Context, in *RoleAuthRequest, opts ...client.CallOption) (*RoleAuthResponse, error) {
+	req := c.c.NewRequest(c.name, "RbacRole.RoleAuth", in)
+	out := new(RoleAuthResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for RbacRole service
 
 type RbacRoleHandler interface {
@@ -101,6 +123,8 @@ type RbacRoleHandler interface {
 	RoleAdd(context.Context, *RoleAddRequest, *RoleAddResponse) error
 	RoleUpdate(context.Context, *RoleUpdateRequest, *RoleUpdateResponse) error
 	RoleDelete(context.Context, *RoleDeleteRequest, *RoleDeleteResponse) error
+	RoleGetAuth(context.Context, *RoleGetAuthRequest, *RoleGetAuthResponse) error
+	RoleAuth(context.Context, *RoleAuthRequest, *RoleAuthResponse) error
 }
 
 func RegisterRbacRoleHandler(s server.Server, hdlr RbacRoleHandler, opts ...server.HandlerOption) error {
@@ -109,6 +133,8 @@ func RegisterRbacRoleHandler(s server.Server, hdlr RbacRoleHandler, opts ...serv
 		RoleAdd(ctx context.Context, in *RoleAddRequest, out *RoleAddResponse) error
 		RoleUpdate(ctx context.Context, in *RoleUpdateRequest, out *RoleUpdateResponse) error
 		RoleDelete(ctx context.Context, in *RoleDeleteRequest, out *RoleDeleteResponse) error
+		RoleGetAuth(ctx context.Context, in *RoleGetAuthRequest, out *RoleGetAuthResponse) error
+		RoleAuth(ctx context.Context, in *RoleAuthRequest, out *RoleAuthResponse) error
 	}
 	type RbacRole struct {
 		rbacRole
@@ -135,4 +161,12 @@ func (h *rbacRoleHandler) RoleUpdate(ctx context.Context, in *RoleUpdateRequest,
 
 func (h *rbacRoleHandler) RoleDelete(ctx context.Context, in *RoleDeleteRequest, out *RoleDeleteResponse) error {
 	return h.RbacRoleHandler.RoleDelete(ctx, in, out)
+}
+
+func (h *rbacRoleHandler) RoleGetAuth(ctx context.Context, in *RoleGetAuthRequest, out *RoleGetAuthResponse) error {
+	return h.RbacRoleHandler.RoleGetAuth(ctx, in, out)
+}
+
+func (h *rbacRoleHandler) RoleAuth(ctx context.Context, in *RoleAuthRequest, out *RoleAuthResponse) error {
+	return h.RbacRoleHandler.RoleAuth(ctx, in, out)
 }
