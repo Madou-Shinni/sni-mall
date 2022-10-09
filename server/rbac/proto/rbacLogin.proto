@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package rbac;
+
+option go_package = "./proto/rbacLogin";
+
+service Rbac {
+	rpc Login(LoginRequest) returns (LoginResponse) {}
+}
+
+message LoginRequest {
+	string username = 1;
+	string password = 2;
+}
+
+message LoginResponse {
+	string token = 1;
+}

@@ -8,7 +8,7 @@ import (
 	"xiaomi-mall/models"
 	utils "xiaomi-mall/models/utils"
 	pb "xiaomi-mall/proto/captcha"
-	pbRbac "xiaomi-mall/proto/rbac"
+	pbRbac "xiaomi-mall/proto/rbacLogin"
 )
 
 const (
