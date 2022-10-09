@@ -42,6 +42,7 @@ type RbacRoleService interface {
 	RoleDelete(ctx context.Context, in *RoleDeleteRequest, opts ...client.CallOption) (*RoleDeleteResponse, error)
 	RoleGetAuth(ctx context.Context, in *RoleGetAuthRequest, opts ...client.CallOption) (*RoleGetAuthResponse, error)
 	RoleAuth(ctx context.Context, in *RoleAuthRequest, opts ...client.CallOption) (*RoleAuthResponse, error)
+	MiddlewaresAuth(ctx context.Context, in *MiddlewaresAuthRequest, opts ...client.CallOption) (*MiddlewaresAuthResponse, error)
 }
 
 type rbacRoleService struct {
@@ -116,6 +117,16 @@ func (c *rbacRoleService) RoleAuth(ctx context.Context, in *RoleAuthRequest, opt
 	return out, nil
 }
 
+func (c *rbacRoleService) MiddlewaresAuth(ctx context.Context, in *MiddlewaresAuthRequest, opts ...client.CallOption) (*MiddlewaresAuthResponse, error) {
+	req := c.c.NewRequest(c.name, "RbacRole.MiddlewaresAuth", in)
+	out := new(MiddlewaresAuthResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for RbacRole service
 
 type RbacRoleHandler interface {
@@ -125,6 +136,7 @@ type RbacRoleHandler interface {
 	RoleDelete(context.Context, *RoleDeleteRequest, *RoleDeleteResponse) error
 	RoleGetAuth(context.Context, *RoleGetAuthRequest, *RoleGetAuthResponse) error
 	RoleAuth(context.Context, *RoleAuthRequest, *RoleAuthResponse) error
+	MiddlewaresAuth(context.Context, *MiddlewaresAuthRequest, *MiddlewaresAuthResponse) error
 }
 
 func RegisterRbacRoleHandler(s server.Server, hdlr RbacRoleHandler, opts ...server.HandlerOption) error {
@@ -135,6 +147,7 @@ func RegisterRbacRoleHandler(s server.Server, hdlr RbacRoleHandler, opts ...serv
 		RoleDelete(ctx context.Context, in *RoleDeleteRequest, out *RoleDeleteResponse) error
 		RoleGetAuth(ctx context.Context, in *RoleGetAuthRequest, out *RoleGetAuthResponse) error
 		RoleAuth(ctx context.Context, in *RoleAuthRequest, out *RoleAuthResponse) error
+		MiddlewaresAuth(ctx context.Context, in *MiddlewaresAuthRequest, out *MiddlewaresAuthResponse) error
 	}
 	type RbacRole struct {
 		rbacRole
@@ -169,4 +182,8 @@ func (h *rbacRoleHandler) RoleGetAuth(ctx context.Context, in *RoleGetAuthReques
 
 func (h *rbacRoleHandler) RoleAuth(ctx context.Context, in *RoleAuthRequest, out *RoleAuthResponse) error {
 	return h.RbacRoleHandler.RoleAuth(ctx, in, out)
+}
+
+func (h *rbacRoleHandler) MiddlewaresAuth(ctx context.Context, in *MiddlewaresAuthRequest, out *MiddlewaresAuthResponse) error {
+	return h.RbacRoleHandler.MiddlewaresAuth(ctx, in, out)
 }

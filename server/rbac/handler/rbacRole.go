@@ -177,3 +177,27 @@ func (e *RbacRole) RoleAuth(ctx context.Context, req *pb.RoleAuthRequest, rsp *p
 
 	return nil
 }
+
+// MiddlewaresAuth 中间件权限判断
+func (e *RbacRole) MiddlewaresAuth(ctx context.Context, req *pb.MiddlewaresAuthRequest, rsp *pb.MiddlewaresAuthResponse) error {
+	// 1.获取用户信息（角色id） req.RoleId
+
+	// 2.获取当前用户的权限id列表
+	var roleAccessList []models.RoleAccess
+	var access models.Access
+	// 把权限id放在一个map类型的对象里面
+	roleAccessMap := make(map[int]int)
+	mysql.DB.Select("access_id").Where("role_id = ?", req.RoleId).Find(&roleAccessList)
+	for _, v := range roleAccessList {
+		roleAccessMap[v.AccessId] = v.AccessId
+	}
+	// 查询url对应的权限id
+	mysql.DB.Select("id").Where("url = ?", req.Url).Find(&access)
+	// 3.匹配当前用户是否有访问当前路由的权限
+	if _, ok := roleAccessMap[access.Id]; !ok {
+		rsp.HasPermission = false
+	} else {
+		rsp.HasPermission = true
+	}
+	return nil
+}

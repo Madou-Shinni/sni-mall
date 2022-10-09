@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/ini.v1"
@@ -11,6 +12,7 @@ import (
 	"xiaomi-mall/models"
 	mysql "xiaomi-mall/models/mysql"
 	"xiaomi-mall/models/utils"
+	pbRbac "xiaomi-mall/proto/rbacRole"
 )
 
 const (
@@ -82,23 +84,39 @@ func InitAdminAuthMiddleware(c *gin.Context) {
 	url := strings.Replace(path, "/admin", "", 1) // 去除一个 -1全部去除
 	// 判断是否是需要做权限处理的url
 	if !excludeAuthPath(url) {
-		// 1.获取用户信息（角色id）
+		//// 1.获取用户信息（角色id）
+		//userId := request.GetCurrentUserId(c)
+		//userInfo := models.Manager{}
+		//mysql.DB.Select("role_id").Where("id = ?", userId).Find(&userInfo)
+		//// 2.获取当前用户的权限id列表
+		//var roleAccessList []models.RoleAccess
+		//var access models.Access
+		//// 把权限id放在一个map类型的对象里面
+		//roleAccessMap := make(map[int]int)
+		//mysql.DB.Select("access_id").Where("role_id = ?", userInfo.RoleId).Find(&roleAccessList)
+		//for _, v := range roleAccessList {
+		//	roleAccessMap[v.AccessId] = v.AccessId
+		//}
+		//// 查询url对应的权限id
+		//mysql.DB.Select("id").Where("url = ?", url).Find(&access)
+		//// 3.匹配当前用户是否有访问当前路由的权限
+		//if _, ok := roleAccessMap[access.Id]; !ok {
+		//	c.String(NOPERMISSIONSCODE, NOPERMISSIONSMSG)
+		//	c.Abort()
+		//	return
+		//}
+
 		userId := request.GetCurrentUserId(c)
 		userInfo := models.Manager{}
 		mysql.DB.Select("role_id").Where("id = ?", userId).Find(&userInfo)
-		// 2.获取当前用户的权限id列表
-		var roleAccessList []models.RoleAccess
-		var access models.Access
-		// 把权限id放在一个map类型的对象里面
-		roleAccessMap := make(map[int]int)
-		mysql.DB.Select("access_id").Where("role_id = ?", userInfo.RoleId).Find(&roleAccessList)
-		for _, v := range roleAccessList {
-			roleAccessMap[v.AccessId] = v.AccessId
-		}
-		// 查询url对应的权限id
-		mysql.DB.Select("id").Where("url = ?", url).Find(&access)
-		// 3.匹配当前用户是否有访问当前路由的权限
-		if _, ok := roleAccessMap[access.Id]; !ok {
+		// 微服务鉴权
+		roleClient := pbRbac.NewRbacRoleService("rbac", models.RbacClient)
+		rsp, _ := roleClient.MiddlewaresAuth(context.Background(), &pbRbac.MiddlewaresAuthRequest{
+			RoleId: int64(userInfo.RoleId),
+			Url:    url,
+		})
+		if !rsp.HasPermission {
+			// 没有权限
 			c.String(NOPERMISSIONSCODE, NOPERMISSIONSMSG)
 			c.Abort()
 			return

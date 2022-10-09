@@ -11,6 +11,7 @@ service RbacRole {
   rpc RoleDelete(RoleDeleteRequest) returns (RoleDeleteResponse) {}
   rpc RoleGetAuth(RoleGetAuthRequest) returns (RoleGetAuthResponse) {}
   rpc RoleAuth(RoleAuthRequest) returns (RoleAuthResponse) {}
+  rpc MiddlewaresAuth(MiddlewaresAuthRequest) returns (MiddlewaresAuthResponse) {}
 }
 
 // 权限
@@ -90,4 +91,14 @@ message RoleAuthRequest {
 
 message RoleAuthResponse {
   bool success = 1;
+}
+
+// 中间件权限验证
+message MiddlewaresAuthRequest {
+  int64 roleId = 1;
+  string url = 2;
+}
+
+message MiddlewaresAuthResponse {
+  bool hasPermission = 1;
 }
