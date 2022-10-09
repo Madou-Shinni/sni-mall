@@ -7,6 +7,7 @@ import (
 	"go-micro.dev/v4/registry"
 	"rbac/handler"
 	. "rbac/models/ini"
+	pbAccess "rbac/proto/rbacAccess"
 	pbLogin "rbac/proto/rbacLogin"
 	pbManager "rbac/proto/rbacManager"
 	pbRole "rbac/proto/rbacRole"
@@ -41,6 +42,10 @@ func main() {
 	}
 	// 注册管理员管理
 	if err := pbManager.RegisterRbacManagerHandler(srv.Server(), new(handler.RbacManager)); err != nil {
+		logger.Fatal(err)
+	}
+	// 注册权限管理
+	if err := pbAccess.RegisterRbacAccessHandler(srv.Server(), new(handler.RbacAccess)); err != nil {
 		logger.Fatal(err)
 	}
 	// Run service

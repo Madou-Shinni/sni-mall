@@ -1,10 +1,11 @@
 package admin
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"xiaomi-mall/models"
-	mysql "xiaomi-mall/models/mysql"
 	"xiaomi-mall/models/utils"
+	pbAccess "xiaomi-mall/proto/rbacAccess"
 )
 
 const (
@@ -19,9 +20,9 @@ type AccessController struct {
 
 // List 权限列表
 func (con AccessController) List(c *gin.Context) {
-	var accessList []models.Access
-	mysql.DB.Where("module_id = ?", 0).Preload("AccessItem").Find(&accessList)
-	con.SuccessAndData(c, accessList)
+	roleClient := pbAccess.NewRbacAccessService("rbac", models.RbacClient)
+	rsp, _ := roleClient.AccessGet(context.Background(), &pbAccess.AccessGetRequest{})
+	con.SuccessAndData(c, rsp.AccessList)
 }
 
 // Add 添加权限
@@ -39,20 +40,22 @@ func (con AccessController) Add(c *gin.Context) {
 		con.Error(c, ParameterError)
 		return
 	}
-	access := models.Access{
+
+	roleClient := pbAccess.NewRbacAccessService("rbac", models.RbacClient)
+	rsp, _ := roleClient.AccessAdd(context.Background(), &pbAccess.AccessAddRequest{
 		ModuleName:  moduleName,
+		Type:        int64(accessType),
 		ActionName:  actionName,
-		Type:        accessType,
 		Url:         url,
-		ModuleId:    moduleId,
-		Sort:        sort,
+		ModuleId:    int64(moduleId),
+		Sort:        int64(sort),
 		Description: description,
-		Status:      status,
-		AddTime:     addTime,
-	}
-	sqlErr := mysql.DB.Create(&access).Error
-	if sqlErr != nil {
-		con.Error(c, FailedAddAccess)
+		Status:      int64(status),
+		AddTime:     int64(addTime),
+	})
+
+	if !rsp.Success {
+		con.Error(c, rsp.Message)
 		return
 	}
 	con.Success(c)
@@ -77,22 +80,25 @@ func (con AccessController) Update(c *gin.Context) {
 		con.Error(c, ParameterError)
 		return
 	}
-	access := models.Access{
-		Id:          id,
+
+	roleClient := pbAccess.NewRbacAccessService("rbac", models.RbacClient)
+	rsp, _ := roleClient.AccessUpdate(context.Background(), &pbAccess.AccessUpdateRequest{
+		Id:          int64(id),
 		ModuleName:  moduleName,
+		Type:        int64(accessType),
 		ActionName:  actionName,
-		Type:        accessType,
 		Url:         url,
-		ModuleId:    moduleId,
-		Sort:        sort,
+		ModuleId:    int64(moduleId),
+		Sort:        int64(sort),
 		Description: description,
-		Status:      status,
-	}
-	sqlErr := mysql.DB.Save(&access).Error
-	if sqlErr != nil {
+		Status:      int64(status),
+	})
+
+	if !rsp.Success {
 		con.Error(c, FailedUpdateAccess)
 		return
 	}
+
 	con.Success(c)
 }
 
@@ -103,16 +109,16 @@ func (con AccessController) Delete(c *gin.Context) {
 		con.Error(c, ParameterError)
 		return
 	}
-	access := models.Access{Id: id}
-	mysql.DB.Find(&access)
-	if access.ModuleId == 0 { // 顶级模块
-		var accessList []models.Access
-		mysql.DB.Where("module_id = ?", access.Id).Find(&accessList)
-		if len(accessList) == 0 {
-			con.Error(c, FailedDeleteChildrenAtFirst)
-			return
-		}
+
+	roleClient := pbAccess.NewRbacAccessService("rbac", models.RbacClient)
+	rsp, _ := roleClient.AccessDelete(context.Background(), &pbAccess.AccessDeleteRequest{
+		Id: int64(id),
+	})
+
+	if !rsp.Success {
+		con.Error(c, rsp.Message)
+		return
 	}
-	mysql.DB.Delete(&access)
+
 	con.Success(c)
 }
