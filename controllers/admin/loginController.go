@@ -6,9 +6,9 @@ import (
 	"go-micro.dev/v4/util/log"
 	"net/http"
 	"xiaomi-mall/models"
-	mysql "xiaomi-mall/models/mysql"
 	utils "xiaomi-mall/models/utils"
 	pb "xiaomi-mall/proto/captcha"
+	pbRbac "xiaomi-mall/proto/rbac"
 )
 
 const (
@@ -38,22 +38,30 @@ func (con LoginController) Login(c *gin.Context) {
 		con.Error(c, FailedCaptVerify)
 	} else { // 验证成功
 		// 3.查询数据库，判断用户名密码是否存在
-		userInfo := models.Manager{}
+		//userInfo := models.Manager{}
 		password = utils.Md5(password)
-		result := mysql.DB.Where("username = ? AND password = ?", username, password).First(&userInfo).RowsAffected // 返回找到的记录数
-		if result > 0 {
+		//result := mysql.DB.Where("username = ? AND password = ?", username, password).First(&userInfo).RowsAffected // 返回找到的记录数
+
+		// 调用rbac微服务
+		rbacClient := pbRbac.NewRbacService("rbac", models.RbacClient)
+		rsp, _ := rbacClient.Login(context.Background(), &pbRbac.LoginRequest{
+			Username: username,
+			Password: password,
+		})
+
+		if rsp.Token != "" {
 			// 4.登录成功，保存用户信息
 			//session := sessions.Default(c)
 			// 注意：session无法直接保存结构体！ 把结构体转换成json字符串
 			//userInfoJsonStr, _ := json.Marshal(userInfo)
 			//session.Set("userInfo", userInfoJsonStr)
 			//session.Save()
-			token, err := utils.GenToken(int64(userInfo.Id), username)
-			if err != nil {
-				con.Error(c, FailedSystem)
-				return
-			}
-			con.SuccessAndData(c, token)
+			//token, err := utils.GenToken(int64(userInfo.Id), username)
+			//if err != nil {
+			//	con.Error(c, FailedSystem)
+			//	return
+			//}
+			con.SuccessAndData(c, rsp.Token)
 		} else {
 			con.Error(c, FailedLogin)
 		}
