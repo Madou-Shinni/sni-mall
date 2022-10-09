@@ -7,6 +7,7 @@ require (
 	github.com/mojocn/base64Captcha v1.3.5
 	go-micro.dev/v4 v4.8.0
 	google.golang.org/protobuf v1.26.0
+	gopkg.in/ini.v1 v1.62.0
 )
 
 require (

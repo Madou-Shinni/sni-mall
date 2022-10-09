@@ -2,23 +2,24 @@ package main
 
 import (
 	"captcha/handler"
+	. "captcha/models/ini"
 	pb "captcha/proto/captcha"
 	"github.com/go-micro/plugins/v4/registry/consul"
-	"go-micro.dev/v4/registry"
-
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/logger"
+	"go-micro.dev/v4/registry"
 )
 
 var (
-	service     = "captcha"
-	version     = "latest"
-	consulAddrs = "127.0.0.1:8500"
+	service = "captcha"
+	version = "latest"
 )
 
 func main() {
-	// 配置consul
-	consulRegistry := consul.NewRegistry(registry.Addrs(consulAddrs))
+	// 读取ini配置
+	addr := Config.Section("consul").Key("addr").String()
+	// 注册consul
+	consulRegistry := consul.NewRegistry(registry.Addrs(addr))
 	// Create service
 	srv := micro.NewService()
 	srv.Init(
