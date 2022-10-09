@@ -8,6 +8,7 @@ import (
 	"rbac/handler"
 	. "rbac/models/ini"
 	pbLogin "rbac/proto/rbacLogin"
+	pbManager "rbac/proto/rbacManager"
 	pbRole "rbac/proto/rbacRole"
 )
 
@@ -30,10 +31,16 @@ func main() {
 	)
 
 	// Register handler
+	// 注册登录
 	if err := pbLogin.RegisterRbacLoginHandler(srv.Server(), new(handler.RbacLogin)); err != nil {
 		logger.Fatal(err)
 	}
+	// 注册角色管理
 	if err := pbRole.RegisterRbacRoleHandler(srv.Server(), new(handler.RbacRole)); err != nil {
+		logger.Fatal(err)
+	}
+	// 注册管理员管理
+	if err := pbManager.RegisterRbacManagerHandler(srv.Server(), new(handler.RbacManager)); err != nil {
 		logger.Fatal(err)
 	}
 	// Run service

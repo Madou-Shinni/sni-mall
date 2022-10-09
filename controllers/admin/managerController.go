@@ -1,11 +1,12 @@
 package admin
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"strings"
 	"xiaomi-mall/models"
-	mysql "xiaomi-mall/models/mysql"
 	"xiaomi-mall/models/utils"
+	pbManager "xiaomi-mall/proto/rbacManager"
 )
 
 const (
@@ -22,9 +23,11 @@ type ManagerController struct {
 
 // List 管理员列表
 func (con ManagerController) List(c *gin.Context) {
-	var managerList []models.Manager
-	mysql.DB.Preload("Role").Find(&managerList)
-	con.SuccessAndData(c, managerList)
+
+	roleClient := pbManager.NewRbacManagerService("rbac", models.RbacClient)
+	rsp, _ := roleClient.ManagerGet(context.Background(), &pbManager.ManagerGetRequest{})
+
+	con.SuccessAndData(c, rsp.ManagerList)
 }
 
 // Add 添加管理员
@@ -42,24 +45,21 @@ func (con ManagerController) Add(c *gin.Context) {
 		con.Error(c, LengthErrorUsernameAndPassword)
 		return
 	}
-	// 判断管理员是否存在
-	manager := models.Manager{Username: username}
-	if affected := mysql.DB.Where("username = ?", username).Find(&manager).RowsAffected; affected > 0 {
-		con.Error(c, UsernameExists)
-		return
-	}
-	manager = models.Manager{
+	roleClient := pbManager.NewRbacManagerService("rbac", models.RbacClient)
+	rsp, _ := roleClient.ManagerAdd(context.Background(), &pbManager.ManagerAddRequest{
 		Username: username,
 		Password: utils.Md5(password),
-		Mobile:   mobile,
 		Email:    email,
-		RoleId:   roleId,
-		AddTime:  int(utils.GetUnix()),
-	}
-	if sqlErr := mysql.DB.Create(&manager).Error; sqlErr != nil {
-		con.Error(c, FailedAddManager)
+		Mobile:   mobile,
+		RoleId:   int64(roleId),
+		Status:   1,
+		AddTime:  int64(utils.GetUnix()),
+	})
+	if !rsp.Success {
+		con.Error(c, rsp.Message)
 		return
 	}
+
 	con.Success(c)
 }
 
@@ -79,25 +79,28 @@ func (con ManagerController) Update(c *gin.Context) {
 	password := strings.Trim(c.PostForm("password"), " ")
 	email := strings.Trim(c.PostForm("email"), " ")
 	mobile := strings.Trim(c.PostForm("mobile"), " ")
-	manager := models.Manager{Id: id}
-	mysql.DB.Find(&manager)
-	manager.Username = username
-	manager.Email = email
-	manager.Mobile = mobile
-	manager.RoleId = roleId
-	// 如果密码为空则不修改，不为空则修改
+
+	//注意：判断密码是否为空 为空表示不修改密码 不为空表示修改密码
 	if password != "" {
-		if len(password) > 6 {
-			con.Error(c, LengthErrorPassword)
-			return
-		}
-		manager.Password = utils.Md5(password)
+		password = utils.Md5(password)
 	}
-	sqlErr := mysql.DB.Save(&manager).Error
-	if sqlErr != nil {
-		con.Error(c, FailedUpdateManager)
+
+	roleClient := pbManager.NewRbacManagerService("rbac", models.RbacClient)
+	rsp, _ := roleClient.ManagerUpdate(context.Background(), &pbManager.ManagerUpdateRequest{
+		Id:       id,
+		Username: username,
+		Password: password,
+		Email:    email,
+		Mobile:   mobile,
+		RoleId:   int64(roleId),
+		Status:   1,
+		AddTime:  int64(utils.GetUnix()),
+	})
+	if !rsp.Success {
+		con.Error(c, rsp.Message)
 		return
 	}
+
 	con.Success(c)
 }
 
@@ -108,7 +111,15 @@ func (con ManagerController) Delete(c *gin.Context) {
 		con.Error(c, ParameterError)
 		return
 	}
-	manager := models.Manager{Id: id}
-	mysql.DB.Delete(&manager)
+
+	roleClient := pbManager.NewRbacManagerService("rbac", models.RbacClient)
+	rsp, _ := roleClient.ManagerDelete(context.Background(), &pbManager.ManagerDeleteRequest{
+		Id: id,
+	})
+	if !rsp.Success {
+		con.Error(c, rsp.Message)
+		return
+	}
+
 	con.Success(c)
 }
